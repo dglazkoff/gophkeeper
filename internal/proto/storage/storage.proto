@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package models;
+
+option go_package = "gophkeeper/internal/proto/storage";
+
+message SavePasswordRequest {
+  string key = 1;
+  string login = 2;
+  string password = 3;
+  optional string metadata = 4;
+}
+
+message SavePasswordResponse {
+}
+
+message GetPasswordRequest {
+  string key = 1;
+}
+
+message GetPasswordResponse {
+  string key = 1;
+  string login = 2;
+  string password = 3;
+  optional string metadata = 4;
+}
+
+message DeletePasswordRequest {
+  string key = 1;
+}
+
+message DeletePasswordResponse {
+}
+
+service Storage {
+  rpc SavePassword(SavePasswordRequest) returns (SavePasswordResponse);
+  rpc GetPassword(GetPasswordRequest) returns (GetPasswordResponse);
+  rpc DeletePassword(DeletePasswordRequest) returns (DeletePasswordResponse);
+}

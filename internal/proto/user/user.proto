@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package models;
+
+option go_package = "gophkeeper/internal/proto/user";
+
+message RegisterUserRequest {
+  string login = 1;
+  string password = 2;
+}
+
+message RegisterUserResponse {
+  string id = 1;
+  string access_token = 2;
+}
+
+message LoginUserRequest {
+  string login = 1;
+  string password = 2;
+}
+
+message LoginUserResponse {
+  string id = 1;
+  string access_token = 2;
+}
+
+service Users {
+  rpc RegisterUser(RegisterUserRequest) returns (RegisterUserResponse);
+  rpc LoginUser(LoginUserRequest) returns (LoginUserResponse);
+}
