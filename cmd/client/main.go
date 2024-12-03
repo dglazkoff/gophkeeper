@@ -3,15 +3,21 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"gophkeeper/internal/auth"
 	"gophkeeper/internal/logger"
+	"log"
 	"os"
 
 	pbStorage "gophkeeper/internal/proto/storage"
 	pbUser "gophkeeper/internal/proto/user"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/credentials"
+)
+
+var (
+	BuildVersion = "N/A"
+	BuildDate    = "N/A"
+	BuildCommit  = "N/A"
 )
 
 type StorageControl interface {
@@ -25,14 +31,19 @@ type Client struct {
 	userClient      pbUser.UsersClient
 	storageClient   pbStorage.StorageClient
 	scanner         *bufio.Scanner
-	authInterceptor *auth.InterceptorClient
+	authInterceptor *InterceptorClient
 }
 
 func NewClient(address string) (*Client, error) {
-	interceptor := auth.NewInterceptorClient()
+	creds, err := credentials.NewClientTLSFromFile("certs/server.crt", "localhost")
+	if err != nil {
+		log.Fatalf("failed to load client TLS credentials: %v", err)
+	}
+
+	interceptor := NewInterceptorClient()
 	conn, err := grpc.NewClient(
 		address,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithTransportCredentials(creds),
 		grpc.WithUnaryInterceptor(interceptor.Unary()),
 	)
 	if err != nil {
@@ -94,11 +105,16 @@ func (c *Client) storageControl(sc StorageControl) {
 	}
 }
 
+// go run -ldflags "-X main.BuildVersion=v1.0.1 -X 'main.BuildDate=$(date +'%Y/%m/%d %H:%M:%S')'" ./cmd/client
 func main() {
 	err := logger.Initialize()
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Printf("Build version: %s\n", BuildVersion)
+	fmt.Printf("Build date: %s\n", BuildDate)
+	fmt.Printf("Build commit: %s\n", BuildCommit)
 
 	client, err := NewClient(":3000")
 	if err != nil {

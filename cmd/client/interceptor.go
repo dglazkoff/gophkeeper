@@ -1,4 +1,4 @@
-package auth
+package main
 
 import (
 	"context"
@@ -24,7 +24,6 @@ func (i *InterceptorClient) Unary() grpc.UnaryClientInterceptor {
 		invoker grpc.UnaryInvoker,
 		opts ...grpc.CallOption,
 	) error {
-
 		return invoker(metadata.AppendToOutgoingContext(ctx, "authorization", i.AccessToken), method, req, reply, cc, opts...)
 	}
 }
