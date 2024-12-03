@@ -3,15 +3,14 @@ package db
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"gophkeeper/internal/logger"
+	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 )
 
 type s3Storage struct {
@@ -27,9 +26,9 @@ type s3Storage struct {
 */
 
 func NewS3() (*s3Storage, error) {
-	endpoint := "http://127.0.0.1:9000"
-	accessKey := "minioadmin"
-	secretKey := "minioadmin"
+	endpoint := os.Getenv("MINIO_ENDPOINT")    // http://127.0.0.1:9000
+	accessKey := os.Getenv("MINIO_ACCESS_KEY") // minioadmin
+	secretKey := os.Getenv("MINIO_SECRET_KEY") //minioadmin
 
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
 		config.WithRegion("us-east-1"),
@@ -61,18 +60,13 @@ func (s *s3Storage) SaveBinaryData(ctx context.Context, userId, key string, data
 	})
 
 	if err != nil {
-		var noSuchBucket *types.NoSuchBucket
-		if errors.As(err, &noSuchBucket) {
-			_, err = s.client.CreateBucket(ctx, &s3.CreateBucketInput{
-				Bucket: aws.String(bucketName),
-			})
+		_, err = s.client.CreateBucket(ctx, &s3.CreateBucketInput{
+			Bucket: aws.String(bucketName),
+		})
 
-			if err != nil {
-				logger.Log.Errorf("failed to create bucket: %v", err)
-				return err
-			}
-		} else {
-			logger.Log.Errorf("failed to check bucket: %v", err)
+		if err != nil {
+			logger.Log.Errorf("failed to create bucket: %v", err)
+			return err
 		}
 	}
 

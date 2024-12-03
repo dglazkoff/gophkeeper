@@ -13,6 +13,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 
 	pbStorage "gophkeeper/internal/proto/storage"
 	pbUser "gophkeeper/internal/proto/user"
@@ -28,12 +29,6 @@ var (
 	BuildCommit  = "N/A"
 )
 
-/*
-	- тесты
-	- документация по тому что устанавливать и как запускать
-
-*/
-
 // go run -ldflags "-X main.BuildVersion=v1.0.1 -X 'main.BuildDate=$(date +'%Y/%m/%d %H:%M:%S')'" ./cmd/server
 func main() {
 	err := logger.Initialize()
@@ -46,8 +41,7 @@ func main() {
 	fmt.Printf("Build date: %s\n", BuildDate)
 	fmt.Printf("Build commit: %s\n", BuildCommit)
 
-	// нужно указать что необходимо иметь эту таблицу
-	pgDB, err := sql.Open("pgx", "postgres://postgres:12345678@localhost:5432/gophkeeper")
+	pgDB, err := sql.Open("pgx", os.Getenv("DATABASE_URL")) //postgres://postgres:12345678@localhost:5432/gophkeeper
 
 	if err != nil {
 		logger.Log.Debug("Error on open db", err)
