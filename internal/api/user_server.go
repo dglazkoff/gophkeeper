@@ -35,7 +35,7 @@ func (us *UserServer) RegisterUser(ctx context.Context, in *pbUser.RegisterUserR
 
 	if err != nil {
 		if errors.Is(err, userservice.ErrorLoginExists) {
-			return nil, status.Errorf(codes.AlreadyExists, "user with login %s already exists")
+			return nil, status.Errorf(codes.AlreadyExists, "user with login %s already exists", in.Login)
 		}
 
 		logger.Log.Error("Error while register user: ", err)

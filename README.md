@@ -3,7 +3,7 @@
 ## Run server
 
 ```bash
-docker-build -t gophkeeper .
+docker build -t gophkeeper .
 ```
 
 ```bash

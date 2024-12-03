@@ -29,7 +29,7 @@ func NewUserService(storage storage) *UserService {
 	return &UserService{storage}
 }
 
-func getHashPassword(password string) string {
+func GetHashPassword(password string) string {
 	h := sha256.New()
 	h.Write([]byte(password))
 	hp := h.Sum(nil)
@@ -57,7 +57,7 @@ func (s *UserService) Register(ctx context.Context, login, password string) erro
 		return err
 	}
 
-	err = s.storage.CreateUser(ctx, tx, login, getHashPassword(password))
+	err = s.storage.CreateUser(ctx, tx, login, GetHashPassword(password))
 
 	if err != nil {
 		logger.Log.Error("Error while create user: ", err)
@@ -80,7 +80,7 @@ func (s *UserService) Login(ctx context.Context, login, password string) error {
 		return ErrorWrongCredentials
 	}
 
-	if user.Password != getHashPassword(password) {
+	if user.Password != GetHashPassword(password) {
 		return ErrorWrongCredentials
 	}
 
