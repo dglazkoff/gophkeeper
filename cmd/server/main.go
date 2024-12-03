@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"gophkeeper/internal/api"
 	"gophkeeper/internal/auth"
 	"gophkeeper/internal/db"
@@ -27,13 +26,21 @@ func main() {
 		panic(err)
 	}
 
+	// нужно указать что необходимо иметь эту таблицу
 	pgDB, err := sql.Open("pgx", "postgres://postgres:12345678@localhost:5432/gophkeeper")
 
 	if err != nil {
-		fmt.Println("Error on open db", err)
+		logger.Log.Debug("Error on open db", err)
 		panic(err)
 	}
 	defer pgDB.Close()
+
+	s3DB, err := db.NewS3()
+
+	if err != nil {
+		logger.Log.Debug("Error on open db", err)
+		panic(err)
+	}
 
 	store := db.New(pgDB)
 	err = store.Bootstrap()
@@ -44,7 +51,7 @@ func main() {
 	}
 
 	us := userservice.NewUserService(store)
-	ss := storageservice.NewStorageService(store)
+	ss := storageservice.NewStorageService(store, s3DB)
 
 	listen, err := net.Listen("tcp", ":3000")
 	if err != nil {

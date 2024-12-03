@@ -32,8 +32,104 @@ message DeletePasswordRequest {
 message DeletePasswordResponse {
 }
 
+message SaveTextRequest {
+  string key = 1;
+  string text = 2;
+  optional string metadata = 3;
+}
+
+message SaveTextResponse {
+}
+
+message GetTextRequest {
+  string key = 1;
+}
+
+message GetTextResponse {
+  string key = 1;
+  string text = 2;
+  optional string metadata = 3;
+}
+
+message DeleteTextRequest {
+  string key = 1;
+}
+
+message DeleteTextResponse {
+}
+
+message SaveBinaryRequest {
+  string key = 1;
+  bytes value = 2;
+  optional string metadata = 3;
+}
+
+message SaveBinaryResponse {
+}
+
+message GetBinaryRequest {
+  string key = 1;
+}
+
+message GetBinaryResponse {
+  string key = 1;
+  bytes value = 2;
+  optional string metadata = 3;
+}
+
+message DeleteBinaryRequest {
+  string key = 1;
+}
+
+message DeleteBinaryResponse {
+}
+
+message SaveBankCardRequest {
+  string key = 1;
+  string number = 2;
+  string cvv = 3;
+  string expirationDate = 4;
+  string holder = 5;
+  optional string metadata = 6;
+}
+
+message SaveBankCardResponse {
+}
+
+message GetBankCardRequest {
+  string key = 1;
+}
+
+message GetBankCardResponse {
+  string key = 1;
+  string number = 2;
+  string cvv = 3;
+  string expirationDate = 4;
+  string holder = 5;
+  optional string metadata = 6;
+}
+
+message DeleteBankCardRequest {
+  string key = 1;
+}
+
+message DeleteBankCardResponse {
+}
+
 service Storage {
   rpc SavePassword(SavePasswordRequest) returns (SavePasswordResponse);
   rpc GetPassword(GetPasswordRequest) returns (GetPasswordResponse);
   rpc DeletePassword(DeletePasswordRequest) returns (DeletePasswordResponse);
+
+  rpc SaveText(SaveTextRequest) returns (SaveTextResponse);
+  rpc GetText(GetTextRequest) returns (GetTextResponse);
+  rpc DeleteText(DeleteTextRequest) returns (DeleteTextResponse);
+
+  rpc SaveBinary(SaveBinaryRequest) returns (SaveBinaryResponse);
+  rpc GetBinary(GetBinaryRequest) returns (GetBinaryResponse);
+  rpc DeleteBinary(DeleteBinaryRequest) returns (DeleteBinaryResponse);
+
+  rpc SaveBankCard(SaveBankCardRequest) returns (SaveBankCardResponse);
+  rpc GetBankCard(GetBankCardRequest) returns (GetBankCardResponse);
+  rpc DeleteBankCard(DeleteBankCardRequest) returns (DeleteBankCardResponse);
 }

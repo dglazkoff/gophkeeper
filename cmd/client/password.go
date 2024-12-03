@@ -6,7 +6,11 @@ import (
 	pbStorage "gophkeeper/internal/proto/storage"
 )
 
-func (c *Client) savePassword() error {
+type PasswordControl struct {
+	*Client
+}
+
+func (c *PasswordControl) save() error {
 	fmt.Println("Введите ключ для сохранения пары логин/пароль:")
 	c.scanner.Scan()
 	key := c.scanner.Text()
@@ -39,7 +43,7 @@ func (c *Client) savePassword() error {
 	return nil
 }
 
-func (c *Client) getPassword() error {
+func (c *PasswordControl) get() error {
 	fmt.Println("Введите ключ для получения пары логин/пароль:")
 	c.scanner.Scan()
 	key := c.scanner.Text()
@@ -60,7 +64,7 @@ func (c *Client) getPassword() error {
 	return nil
 }
 
-func (c *Client) deletePassword() error {
+func (c *PasswordControl) delete() error {
 	fmt.Println("Введите ключ для удаления пары логин/пароль:")
 	c.scanner.Scan()
 	key := c.scanner.Text()
@@ -77,35 +81,4 @@ func (c *Client) deletePassword() error {
 	fmt.Println("Пара логин/пароль успешно удалена")
 
 	return nil
-}
-
-func (c *Client) keepPassword() {
-	for {
-		fmt.Println("1 - Сохранить логин/пароль")
-		fmt.Println("2 - Получить логин/пароль")
-		fmt.Println("3 - Удалить логин/пароль")
-		fmt.Println("0 - Выйти")
-
-		c.scanner.Scan()
-		line := c.scanner.Text()
-		switch line {
-		case "1":
-			err := c.savePassword()
-			if err == nil {
-				break
-			}
-		case "2":
-			err := c.getPassword()
-			if err == nil {
-				break
-			}
-		case "3":
-			err := c.deletePassword()
-			if err == nil {
-				break
-			}
-		case "0":
-			return
-		}
-	}
 }

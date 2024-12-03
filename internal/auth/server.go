@@ -29,6 +29,18 @@ func authMethods() map[string]bool {
 		storageServicePath + "SavePassword":   true,
 		storageServicePath + "GetPassword":    true,
 		storageServicePath + "DeletePassword": true,
+
+		storageServicePath + "SaveText":   true,
+		storageServicePath + "GetText":    true,
+		storageServicePath + "DeleteText": true,
+
+		storageServicePath + "SaveBinary":   true,
+		storageServicePath + "GetBinary":    true,
+		storageServicePath + "DeleteBinary": true,
+
+		storageServicePath + "SaveBankCard":   true,
+		storageServicePath + "GetBankCard":    true,
+		storageServicePath + "DeleteBankCard": true,
 	}
 }
 

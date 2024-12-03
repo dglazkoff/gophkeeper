@@ -38,6 +38,19 @@ func (s *dbStorage) Bootstrap() error {
 		return err
 	}
 
+	_, err = s.db.Exec("CREATE TABLE IF NOT EXISTS binary_storage (" +
+		"key VARCHAR(250) NOT NULL, " +
+		"user_id VARCHAR(250) NOT NULL, " +
+		"value VARCHAR(250) NOT NULL, " +
+		"metadata VARCHAR(250), " +
+		"PRIMARY KEY(key, user_id)" +
+		")")
+
+	if err != nil {
+		logger.Log.Error("Error while create table storage: ", err)
+		return err
+	}
+
 	return nil
 }
 
