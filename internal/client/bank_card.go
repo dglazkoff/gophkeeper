@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"context"
@@ -10,32 +10,32 @@ type BankCardControl struct {
 	*Client
 }
 
-func (c *BankCardControl) save() error {
+func (c *BankCardControl) Save() error {
 	fmt.Println("Введите ключ для сохранения данных карты:")
-	c.scanner.Scan()
-	key := c.scanner.Text()
+	c.Scanner.Scan()
+	key := c.Scanner.Text()
 
 	fmt.Println("Введите номер карты:")
-	c.scanner.Scan()
-	num := c.scanner.Text()
+	c.Scanner.Scan()
+	num := c.Scanner.Text()
 
 	fmt.Println("Введите имя и фамилию владельца карты:")
-	c.scanner.Scan()
-	holder := c.scanner.Text()
+	c.Scanner.Scan()
+	holder := c.Scanner.Text()
 
 	fmt.Println("Введите cvv код карты:")
-	c.scanner.Scan()
-	cvv := c.scanner.Text()
+	c.Scanner.Scan()
+	cvv := c.Scanner.Text()
 
 	fmt.Println("Введите дату окончания действия карты:")
-	c.scanner.Scan()
-	expireDate := c.scanner.Text()
+	c.Scanner.Scan()
+	expireDate := c.Scanner.Text()
 
 	fmt.Println("Введите дополнительные данные (or press Enter):")
-	c.scanner.Scan()
-	md := c.scanner.Text()
+	c.Scanner.Scan()
+	md := c.Scanner.Text()
 
-	_, err := c.storageClient.SaveBankCard(context.Background(), &pbStorage.SaveBankCardRequest{
+	_, err := c.StorageClient.SaveBankCard(context.Background(), &pbStorage.SaveBankCardRequest{
 		Key:            key,
 		Number:         num,
 		Holder:         holder,
@@ -53,12 +53,12 @@ func (c *BankCardControl) save() error {
 	return nil
 }
 
-func (c *BankCardControl) get() error {
+func (c *BankCardControl) Get() error {
 	fmt.Println("Введите ключ для получения данных банковской карты:")
-	c.scanner.Scan()
-	key := c.scanner.Text()
+	c.Scanner.Scan()
+	key := c.Scanner.Text()
 
-	res, err := c.storageClient.GetBankCard(context.Background(), &pbStorage.GetBankCardRequest{
+	res, err := c.StorageClient.GetBankCard(context.Background(), &pbStorage.GetBankCardRequest{
 		Key: key,
 	})
 
@@ -76,12 +76,12 @@ func (c *BankCardControl) get() error {
 	return nil
 }
 
-func (c *BankCardControl) delete() error {
+func (c *BankCardControl) Delete() error {
 	fmt.Println("Введите ключ для удаления банковской карты:")
-	c.scanner.Scan()
-	key := c.scanner.Text()
+	c.Scanner.Scan()
+	key := c.Scanner.Text()
 
-	_, err := c.storageClient.DeleteBankCard(context.Background(), &pbStorage.DeleteBankCardRequest{
+	_, err := c.StorageClient.DeleteBankCard(context.Background(), &pbStorage.DeleteBankCardRequest{
 		Key: key,
 	})
 

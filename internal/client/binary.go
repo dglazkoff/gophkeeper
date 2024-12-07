@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"context"
@@ -12,10 +12,10 @@ type BinaryControl struct {
 	*Client
 }
 
-func (c *BinaryControl) save() error {
+func (c *BinaryControl) Save() error {
 	fmt.Println("Введите путь для получения бинарных данных:")
-	c.scanner.Scan()
-	path := c.scanner.Text()
+	c.Scanner.Scan()
+	path := c.Scanner.Text()
 
 	data, err := os.ReadFile(path)
 
@@ -25,10 +25,10 @@ func (c *BinaryControl) save() error {
 	}
 
 	fmt.Println("Введите дополнительные данные (or press Enter):")
-	c.scanner.Scan()
-	md := c.scanner.Text()
+	c.Scanner.Scan()
+	md := c.Scanner.Text()
 
-	_, err = c.storageClient.SaveBinary(context.Background(), &pbStorage.SaveBinaryRequest{
+	_, err = c.StorageClient.SaveBinary(context.Background(), &pbStorage.SaveBinaryRequest{
 		Key:      filepath.Base(path),
 		Value:    data,
 		Metadata: &md,
@@ -43,14 +43,14 @@ func (c *BinaryControl) save() error {
 	return nil
 }
 
-func (c *BinaryControl) get() error {
+func (c *BinaryControl) Get() error {
 	fmt.Println("Введите ключ для получения данных:")
-	c.scanner.Scan()
-	key := c.scanner.Text()
+	c.Scanner.Scan()
+	key := c.Scanner.Text()
 
 	fmt.Println("Введите путь для сохранения бинарных данных:")
-	c.scanner.Scan()
-	path := c.scanner.Text()
+	c.Scanner.Scan()
+	path := c.Scanner.Text()
 
 	file, err := os.Create(path)
 	defer file.Close()
@@ -60,7 +60,7 @@ func (c *BinaryControl) get() error {
 		return err
 	}
 
-	res, err := c.storageClient.GetBinary(context.Background(), &pbStorage.GetBinaryRequest{
+	res, err := c.StorageClient.GetBinary(context.Background(), &pbStorage.GetBinaryRequest{
 		Key: key,
 	})
 
@@ -82,12 +82,12 @@ func (c *BinaryControl) get() error {
 	return nil
 }
 
-func (c *BinaryControl) delete() error {
+func (c *BinaryControl) Delete() error {
 	fmt.Println("Введите ключ для удаления бинарных данных:")
-	c.scanner.Scan()
-	key := c.scanner.Text()
+	c.Scanner.Scan()
+	key := c.Scanner.Text()
 
-	_, err := c.storageClient.DeleteBinary(context.Background(), &pbStorage.DeleteBinaryRequest{
+	_, err := c.StorageClient.DeleteBinary(context.Background(), &pbStorage.DeleteBinaryRequest{
 		Key: key,
 	})
 

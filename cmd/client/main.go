@@ -1,17 +1,10 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
+	"gophkeeper/internal/client"
 	"gophkeeper/internal/logger"
-	"log"
 	"os"
-
-	pbStorage "gophkeeper/internal/proto/storage"
-	pbUser "gophkeeper/internal/proto/user"
-
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 )
 
 var (
@@ -19,50 +12,6 @@ var (
 	BuildDate    = "N/A"
 	BuildCommit  = "N/A"
 )
-
-type StorageControl interface {
-	save() error
-	get() error
-	delete() error
-}
-
-type Client struct {
-	conn            *grpc.ClientConn
-	userClient      pbUser.UsersClient
-	storageClient   pbStorage.StorageClient
-	scanner         *bufio.Scanner
-	authInterceptor *InterceptorClient
-}
-
-func NewClient(address string) (*Client, error) {
-	creds, err := credentials.NewClientTLSFromFile("certs/server.crt", "localhost")
-	if err != nil {
-		log.Fatalf("failed to load client TLS credentials: %v", err)
-	}
-
-	interceptor := NewInterceptorClient()
-	conn, err := grpc.NewClient(
-		address,
-		grpc.WithTransportCredentials(creds),
-		grpc.WithUnaryInterceptor(interceptor.Unary()),
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	userClient := pbUser.NewUsersClient(conn)
-	storageClient := pbStorage.NewStorageClient(conn)
-
-	scanner := bufio.NewScanner(os.Stdin)
-
-	return &Client{
-		conn:            conn,
-		userClient:      userClient,
-		storageClient:   storageClient,
-		scanner:         scanner,
-		authInterceptor: interceptor,
-	}, nil
-}
 
 func shawAllCommands() {
 	fmt.Println("Возможные команды:")
@@ -72,37 +21,6 @@ func shawAllCommands() {
 	fmt.Println("4 - Банковская карта")
 
 	fmt.Println("Ожидание ввода команды (для выхода нажмите Ctrl+D):")
-}
-
-func (c *Client) storageControl(sc StorageControl) {
-	for {
-		fmt.Println("1 - Сохранить")
-		fmt.Println("2 - Получить")
-		fmt.Println("3 - Удалить")
-		fmt.Println("0 - Выйти")
-
-		c.scanner.Scan()
-		line := c.scanner.Text()
-		switch line {
-		case "1":
-			err := sc.save()
-			if err == nil {
-				break
-			}
-		case "2":
-			err := sc.get()
-			if err == nil {
-				break
-			}
-		case "3":
-			err := sc.delete()
-			if err == nil {
-				break
-			}
-		case "0":
-			return
-		}
-	}
 }
 
 // go run -ldflags "-X main.BuildVersion=v1.0.1 -X 'main.BuildDate=$(date +'%Y/%m/%d %H:%M:%S')'" ./cmd/client
@@ -116,39 +34,39 @@ func main() {
 	fmt.Printf("Build date: %s\n", BuildDate)
 	fmt.Printf("Build commit: %s\n", BuildCommit)
 
-	client, err := NewClient(":3000")
+	c, err := client.NewClient(":3000")
 	if err != nil {
 		logger.Log.Error("Error while create client: ", err)
 		return
 	}
 
-	defer client.conn.Close()
+	defer c.Conn.Close()
 
-	client.authUser()
+	c.AuthUser()
 	shawAllCommands()
 
-	passwordControl := PasswordControl{client}
-	textControl := TextControl{client}
-	binaryControl := BinaryControl{client}
-	bankCardControl := BankCardControl{client}
+	passwordControl := client.PasswordControl{Client: c}
+	textControl := client.TextControl{Client: c}
+	binaryControl := client.BinaryControl{Client: c}
+	bankCardControl := client.BankCardControl{Client: c}
 
-	for client.scanner.Scan() {
-		line := client.scanner.Text()
+	for c.Scanner.Scan() {
+		line := c.Scanner.Text()
 		switch line {
 		case "1":
-			client.storageControl(&passwordControl)
+			c.StorageControl(&passwordControl)
 		case "2":
-			client.storageControl(&textControl)
+			c.StorageControl(&textControl)
 		case "3":
-			client.storageControl(&binaryControl)
+			c.StorageControl(&binaryControl)
 		case "4":
-			client.storageControl(&bankCardControl)
+			c.StorageControl(&bankCardControl)
 		}
 
 		shawAllCommands()
 	}
 
-	if err := client.scanner.Err(); err != nil {
+	if err := c.Scanner.Err(); err != nil {
 		fmt.Fprintln(os.Stderr, "Ошибка:", err)
 	}
 }

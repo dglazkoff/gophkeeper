@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"context"
@@ -10,20 +10,20 @@ type TextControl struct {
 	*Client
 }
 
-func (c *TextControl) save() error {
+func (c *TextControl) Save() error {
 	fmt.Println("Введите ключ для сохранения текста:")
-	c.scanner.Scan()
-	key := c.scanner.Text()
+	c.Scanner.Scan()
+	key := c.Scanner.Text()
 
 	fmt.Println("Введите текст:")
-	c.scanner.Scan()
-	text := c.scanner.Text()
+	c.Scanner.Scan()
+	text := c.Scanner.Text()
 
 	fmt.Println("Введите дополнительные данные (or press Enter):")
-	c.scanner.Scan()
-	md := c.scanner.Text()
+	c.Scanner.Scan()
+	md := c.Scanner.Text()
 
-	_, err := c.storageClient.SaveText(context.Background(), &pbStorage.SaveTextRequest{
+	_, err := c.StorageClient.SaveText(context.Background(), &pbStorage.SaveTextRequest{
 		Key:      key,
 		Text:     text,
 		Metadata: &md,
@@ -38,12 +38,12 @@ func (c *TextControl) save() error {
 	return nil
 }
 
-func (c *TextControl) get() error {
+func (c *TextControl) Get() error {
 	fmt.Println("Введите ключ для получения текста:")
-	c.scanner.Scan()
-	key := c.scanner.Text()
+	c.Scanner.Scan()
+	key := c.Scanner.Text()
 
-	res, err := c.storageClient.GetText(context.Background(), &pbStorage.GetTextRequest{
+	res, err := c.StorageClient.GetText(context.Background(), &pbStorage.GetTextRequest{
 		Key: key,
 	})
 
@@ -58,12 +58,12 @@ func (c *TextControl) get() error {
 	return nil
 }
 
-func (c *TextControl) delete() error {
+func (c *TextControl) Delete() error {
 	fmt.Println("Введите ключ для удаления текста:")
-	c.scanner.Scan()
-	key := c.scanner.Text()
+	c.Scanner.Scan()
+	key := c.Scanner.Text()
 
-	_, err := c.storageClient.DeleteText(context.Background(), &pbStorage.DeleteTextRequest{
+	_, err := c.StorageClient.DeleteText(context.Background(), &pbStorage.DeleteTextRequest{
 		Key: key,
 	})
 

@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"context"
@@ -10,24 +10,24 @@ type PasswordControl struct {
 	*Client
 }
 
-func (c *PasswordControl) save() error {
+func (c *PasswordControl) Save() error {
 	fmt.Println("Введите ключ для сохранения пары логин/пароль:")
-	c.scanner.Scan()
-	key := c.scanner.Text()
+	c.Scanner.Scan()
+	key := c.Scanner.Text()
 
 	fmt.Println("Введите логин:")
-	c.scanner.Scan()
-	login := c.scanner.Text()
+	c.Scanner.Scan()
+	login := c.Scanner.Text()
 
 	fmt.Println("Введите пароль:")
-	c.scanner.Scan()
-	password := c.scanner.Text()
+	c.Scanner.Scan()
+	password := c.Scanner.Text()
 
 	fmt.Println("Введите дополнительные данные (or press Enter):")
-	c.scanner.Scan()
-	md := c.scanner.Text()
+	c.Scanner.Scan()
+	md := c.Scanner.Text()
 
-	_, err := c.storageClient.SavePassword(context.Background(), &pbStorage.SavePasswordRequest{
+	_, err := c.StorageClient.SavePassword(context.Background(), &pbStorage.SavePasswordRequest{
 		Key:      key,
 		Login:    login,
 		Password: password,
@@ -43,12 +43,12 @@ func (c *PasswordControl) save() error {
 	return nil
 }
 
-func (c *PasswordControl) get() error {
+func (c *PasswordControl) Get() error {
 	fmt.Println("Введите ключ для получения пары логин/пароль:")
-	c.scanner.Scan()
-	key := c.scanner.Text()
+	c.Scanner.Scan()
+	key := c.Scanner.Text()
 
-	res, err := c.storageClient.GetPassword(context.Background(), &pbStorage.GetPasswordRequest{
+	res, err := c.StorageClient.GetPassword(context.Background(), &pbStorage.GetPasswordRequest{
 		Key: key,
 	})
 
@@ -64,12 +64,12 @@ func (c *PasswordControl) get() error {
 	return nil
 }
 
-func (c *PasswordControl) delete() error {
+func (c *PasswordControl) Delete() error {
 	fmt.Println("Введите ключ для удаления пары логин/пароль:")
-	c.scanner.Scan()
-	key := c.scanner.Text()
+	c.Scanner.Scan()
+	key := c.Scanner.Text()
 
-	_, err := c.storageClient.DeletePassword(context.Background(), &pbStorage.DeletePasswordRequest{
+	_, err := c.StorageClient.DeletePassword(context.Background(), &pbStorage.DeletePasswordRequest{
 		Key: key,
 	})
 

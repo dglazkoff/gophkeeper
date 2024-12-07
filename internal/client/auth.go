@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"context"
@@ -6,16 +6,16 @@ import (
 	pbUser "gophkeeper/internal/proto/user"
 )
 
-func (c *Client) login() error {
+func (c *Client) Login() error {
 	fmt.Println("Введите логин:")
-	c.scanner.Scan()
-	login := c.scanner.Text()
+	c.Scanner.Scan()
+	login := c.Scanner.Text()
 
 	fmt.Println("Введите пароль:")
-	c.scanner.Scan()
-	password := c.scanner.Text()
+	c.Scanner.Scan()
+	password := c.Scanner.Text()
 
-	res, err := c.userClient.LoginUser(context.Background(), &pbUser.LoginUserRequest{
+	res, err := c.UserClient.LoginUser(context.Background(), &pbUser.LoginUserRequest{
 		Login:    login,
 		Password: password,
 	})
@@ -26,21 +26,21 @@ func (c *Client) login() error {
 	}
 
 	token := res.GetAccessToken()
-	c.authInterceptor.AccessToken = token
+	c.AuthInterceptor.AccessToken = token
 
 	return nil
 }
 
-func (c *Client) register() error {
+func (c *Client) Register() error {
 	fmt.Println("Введите логин:")
-	c.scanner.Scan()
-	login := c.scanner.Text()
+	c.Scanner.Scan()
+	login := c.Scanner.Text()
 
 	fmt.Println("Введите пароль:")
-	c.scanner.Scan()
-	password := c.scanner.Text()
+	c.Scanner.Scan()
+	password := c.Scanner.Text()
 
-	res, err := c.userClient.RegisterUser(context.Background(), &pbUser.RegisterUserRequest{
+	res, err := c.UserClient.RegisterUser(context.Background(), &pbUser.RegisterUserRequest{
 		Login:    login,
 		Password: password,
 	})
@@ -51,25 +51,25 @@ func (c *Client) register() error {
 	}
 
 	token := res.GetAccessToken()
-	c.authInterceptor.AccessToken = token
+	c.AuthInterceptor.AccessToken = token
 
 	return nil
 }
 
-func (c *Client) authUser() {
+func (c *Client) AuthUser() {
 	for {
 		fmt.Println("Вы уже зарегистрированы? (y/n)")
-		c.scanner.Scan()
-		answer := c.scanner.Text()
+		c.Scanner.Scan()
+		answer := c.Scanner.Text()
 
 		if answer == "y" {
-			err := c.login()
+			err := c.Login()
 
 			if err == nil {
 				break
 			}
 		} else if answer == "n" {
-			err := c.register()
+			err := c.Register()
 
 			if err == nil {
 				break

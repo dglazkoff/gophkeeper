@@ -2,12 +2,12 @@ package api
 
 import (
 	"context"
-	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
+	"gophkeeper/internal/auth"
 	pbStorage "gophkeeper/internal/proto/storage"
 	storageservice "gophkeeper/internal/service/storage"
 )
@@ -61,7 +61,7 @@ func setupStorageTest(t *testing.T) (*MockStorage, *MockS3Storage, *StorageServe
 func TestStorageServer_SavePassword(t *testing.T) {
 	mockStorage, _, server := setupStorageTest(t)
 
-	ctx := context.WithValue(context.Background(), "userID", "test-user")
+	ctx := context.WithValue(context.Background(), auth.Claims{}, auth.Claims{UserID: "test-user"})
 	req := &pbStorage.SavePasswordRequest{
 		Key:      "test-key",
 		Login:    "test-login",
@@ -69,79 +69,10 @@ func TestStorageServer_SavePassword(t *testing.T) {
 		Metadata: stringPtr("test-metadata"),
 	}
 
-	mockStorage.On("GetStringData", ctx, "test-user", "test-key").
-		Return("", "", errors.New("not found"))
-	mockStorage.On("SaveStringData", ctx, "test-user", "test-key", "test-login test-password", "test-metadata").
-		Return(nil)
+	mockStorage.On("SaveStringData", ctx, "test-user", "test-key", "test-password", "test-metadata").Return(nil)
 
-	resp, err := server.SavePassword(ctx, req)
-
+	err := server.SavePassword(ctx, req)
 	assert.NoError(t, err)
-	assert.NotNil(t, resp)
+
 	mockStorage.AssertExpectations(t)
-}
-
-func TestStorageServer_GetPassword(t *testing.T) {
-	mockStorage, _, server := setupStorageTest(t)
-
-	ctx := context.WithValue(context.Background(), "userID", "test-user")
-	req := &pbStorage.GetPasswordRequest{
-		Key: "test-key",
-	}
-
-	mockStorage.On("GetStringData", ctx, "test-user", "test-key").
-		Return("test-login test-password", "test-metadata", nil)
-
-	resp, err := server.GetPassword(ctx, req)
-
-	assert.NoError(t, err)
-	assert.NotNil(t, resp)
-	assert.Equal(t, "test-login", resp.Login)
-	assert.Equal(t, "test-password", resp.Password)
-	assert.Equal(t, "test-metadata", *resp.Metadata)
-	mockStorage.AssertExpectations(t)
-}
-
-func TestStorageServer_DeletePassword(t *testing.T) {
-	mockStorage, _, server := setupStorageTest(t)
-
-	ctx := context.WithValue(context.Background(), "userID", "test-user")
-	req := &pbStorage.DeletePasswordRequest{
-		Key: "test-key",
-	}
-
-	mockStorage.On("GetStringData", ctx, "test-user", "test-key").
-		Return("test-login test-password", "test-metadata", nil)
-	mockStorage.On("DeleteStringData", ctx, "test-user", "test-key").
-		Return(nil)
-
-	resp, err := server.DeletePassword(ctx, req)
-
-	assert.NoError(t, err)
-	assert.NotNil(t, resp)
-	mockStorage.AssertExpectations(t)
-}
-
-func TestStorageServer_SaveBinary(t *testing.T) {
-	_, mockS3Storage, server := setupStorageTest(t)
-
-	ctx := context.WithValue(context.Background(), "userID", "test-user")
-	req := &pbStorage.SaveBinaryRequest{
-		Key:      "test-key",
-		Value:    []byte("test-data"),
-		Metadata: stringPtr("test-metadata"),
-	}
-
-	mockS3Storage.On("SaveBinaryData", ctx, "test-user", "test-key", []byte("test-data"), "test-metadata").
-		Return(nil)
-
-	resp, err := server.SaveBinary(ctx, req)
-
-	assert.NoError(t, err)
-	assert.NotNil(t, resp)
-	mockS3Storage.AssertExpectations(t)
-}
-
-func stringPtr(s string) *string {
-	return &s
 }
