@@ -67,7 +67,7 @@ func main() {
 	us := userservice.NewUserService(store)
 	ss := storageservice.NewStorageService(store, s3DB)
 
-	creds, err := credentials.NewServerTLSFromFile("certs/server.crt", "certs/server.key")
+	creds, err := credentials.NewServerTLSFromFile("./certs/server.crt", "./certs/server.key")
 	if err != nil {
 		log.Fatalf("failed to load server TLS credentials: %v", err)
 	}

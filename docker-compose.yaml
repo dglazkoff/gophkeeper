@@ -12,9 +12,22 @@ services:
       - MINIO_ENDPOINT=http://minio:9000
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
+    volumes:
+      - ./certs:/app/certs
     depends_on:
-      - postgres
-      - minio
+      certs:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_started
+      minio:
+        condition: service_started
+
+#  client:
+#    image: gophkeeper
+#    container_name: go_client
+#    command: /app/client
+#    depends_on:
+#      - app
 
   postgres:
     image: postgres:15
@@ -41,6 +54,20 @@ services:
     volumes:
       - minio_data:/data
 
+  certs:
+    image: alpine
+    container_name: certs_generator
+    command: >
+      sh -c "
+      apk add openssl &&
+      mkdir -p /certs &&
+      openssl genrsa -out /certs/server.key 2048 &&
+      openssl req -new -key /certs/server.key -out /certs/server.csr -config /openssl-san.cnf -subj '/CN=localhost' &&
+      openssl x509 -req -in /certs/server.csr -signkey /certs/server.key -out /certs/server.crt -extfile /openssl-san.cnf -extensions v3_req -days 365
+      "
+    volumes:
+      - ./certs:/certs
+      - ./certs/openssl-san.cnf:/openssl-san.cnf:ro
 volumes:
   pgdata:
   minio_data:
