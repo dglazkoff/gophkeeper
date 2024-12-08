@@ -8,6 +8,7 @@ import (
 	"gophkeeper/internal/auth"
 	"gophkeeper/internal/db"
 	"gophkeeper/internal/logger"
+	serverservice "gophkeeper/internal/service/server"
 	storageservice "gophkeeper/internal/service/storage"
 	userservice "gophkeeper/internal/service/user"
 	"log"
@@ -15,6 +16,7 @@ import (
 	"net/http"
 	"os"
 
+	pbServer "gophkeeper/internal/proto/server"
 	pbStorage "gophkeeper/internal/proto/storage"
 	pbUser "gophkeeper/internal/proto/user"
 
@@ -65,7 +67,8 @@ func main() {
 	}
 
 	us := userservice.NewUserService(store)
-	ss := storageservice.NewStorageService(store, s3DB)
+	storageService := storageservice.NewStorageService(store, s3DB)
+	serverService := serverservice.NewServerService(store)
 
 	creds, err := credentials.NewServerTLSFromFile("./certs/server.crt", "./certs/server.key")
 	if err != nil {
@@ -80,7 +83,8 @@ func main() {
 	interceptor := auth.NewInterceptorServer()
 	grpcServer := grpc.NewServer(grpc.Creds(creds), grpc.UnaryInterceptor(interceptor.Unary()))
 	pbUser.RegisterUsersServer(grpcServer, api.NewUserServer(us))
-	pbStorage.RegisterStorageServer(grpcServer, api.NewStorageServer(ss))
+	pbStorage.RegisterStorageServer(grpcServer, api.NewStorageServer(storageService))
+	pbServer.RegisterServerServer(grpcServer, api.NewServer(serverService))
 
 	if err := grpcServer.Serve(listen); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		panic(err)

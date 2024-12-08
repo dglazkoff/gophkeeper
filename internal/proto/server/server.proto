@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package models;
+
+option go_package = "gophkeeper/internal/proto/server";
+
+message PingRequest {
+}
+
+message PingResponse {
+}
+
+service Server {
+  rpc Ping(PingRequest) returns (PingResponse);
+}

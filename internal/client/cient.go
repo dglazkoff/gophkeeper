@@ -3,6 +3,7 @@ package client
 import (
 	"bufio"
 	"fmt"
+	pbServer "gophkeeper/internal/proto/server"
 	pbStorage "gophkeeper/internal/proto/storage"
 	pbUser "gophkeeper/internal/proto/user"
 	"log"
@@ -22,6 +23,7 @@ type Client struct {
 	Conn            *grpc.ClientConn
 	UserClient      pbUser.UsersClient
 	StorageClient   pbStorage.StorageClient
+	ServerClient    pbServer.ServerClient
 	Scanner         *bufio.Scanner
 	AuthInterceptor *InterceptorClient
 }
@@ -44,6 +46,7 @@ func NewClient(address string) (*Client, error) {
 
 	userClient := pbUser.NewUsersClient(conn)
 	storageClient := pbStorage.NewStorageClient(conn)
+	serverClient := pbServer.NewServerClient(conn)
 
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -51,6 +54,7 @@ func NewClient(address string) (*Client, error) {
 		Conn:            conn,
 		UserClient:      userClient,
 		StorageClient:   storageClient,
+		ServerClient:    serverClient,
 		Scanner:         scanner,
 		AuthInterceptor: interceptor,
 	}, nil

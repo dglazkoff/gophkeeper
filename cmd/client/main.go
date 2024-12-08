@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"gophkeeper/internal/client"
 	"gophkeeper/internal/logger"
+	pbServer "gophkeeper/internal/proto/server"
 	"os"
 )
 
@@ -41,6 +43,13 @@ func main() {
 	}
 
 	defer c.Conn.Close()
+
+	_, err = c.ServerClient.Ping(context.Background(), &pbServer.PingRequest{})
+
+	if err != nil {
+		logger.Log.Error("Error while ping server: ", err)
+		panic(err)
+	}
 
 	c.AuthUser()
 	shawAllCommands()

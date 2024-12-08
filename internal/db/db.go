@@ -57,3 +57,7 @@ func (s *dbStorage) Bootstrap() error {
 func (s *dbStorage) BeginTx(ctx context.Context, options *sql.TxOptions) (*sql.Tx, error) {
 	return s.db.BeginTx(ctx, options)
 }
+
+func (s *dbStorage) Ping(ctx context.Context) error {
+	return s.db.PingContext(ctx)
+}
