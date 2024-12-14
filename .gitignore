@@ -1,0 +1,4 @@
+.idea
+certs/server.crt
+certs/server.key
+certs/server.csr
